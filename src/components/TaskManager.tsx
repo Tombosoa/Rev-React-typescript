@@ -1,24 +1,27 @@
 import { nanoid } from "nanoid";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import "./TaskManager.css";
 
 // TODO: create custom hook to manage task state
 export const TaskManager = () => {
   const [title, setTitle] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  
 
   // remove task from list
-  const completeTask = (id) => {
-    setTasks(tasks.filter((task) => task.id !== id));
+  const completeTask = (id:string) => {
+    setTasks(tasks.filter((task: { id: string }) => task.id !== id));
+    
   };
 
-  const updateTask = (id, taskUpdate) => {
+  const updateTask = (id:string, taskUpdate:string) => {
     const newTasks = tasks.slice();
 
-    const index = tasks.findIndex((task) => task.id === id);
+    const index = tasks.findIndex((task:{id:string}) => task.id === id);
 
-    newTasks[index] = taskUpdate;
+    newTasks[index].title = taskUpdate 
 
     setTasks(newTasks);
   };
@@ -28,20 +31,22 @@ export const TaskManager = () => {
       return;
     }
 
-    const newTask = {
+    const newTask:Task= {
       // using nanoid to generate unique id
       id: nanoid(),
       title,
     };
-    setTasks((prev) => prev.concat(newTask));
+   
+    
+    setTasks((prevTasks)=>prevTasks.concat(newTask))
     setTitle("");
   };
 
-  const handleSearch = (ev) => {
+  const handleSearch = (ev: { target: { value: SetStateAction<string>; }; }) => {
     setSearchKeyword(ev.target.value);
   };
 
-  const filteredTasks = tasks.filter((task) =>
+  const filteredTasks = tasks.filter((task:{title:string}) =>
     task.title.toLowerCase().includes(searchKeyword.toLowerCase()),
   );
 
@@ -73,7 +78,7 @@ export const TaskManager = () => {
                 type="text"
                 placeholder="Add new task"
                 value={task.title}
-                onChange={(e) => updateTask(task.id, { title: e.target.value })}
+                onChange={(e) => updateTask(task.id,  e.target.value )}
               />
               <button onClick={() => completeTask(task.id)}>Done</button>
             </div>
